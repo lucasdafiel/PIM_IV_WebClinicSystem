@@ -1,0 +1,6 @@
+@WebClinicSystem.Api_HostAddress = http://localhost:5211
+
+GET {{WebClinicSystem.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
