@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MediatR
 
-namespace WebClinicSystem.Application.Feature.Pacientes.Commands
+namespace WebClinicSystem.Application.Features.Pacientes.Commands
 {
     using MediatR;
 

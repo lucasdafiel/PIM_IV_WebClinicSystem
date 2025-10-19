@@ -8,15 +8,12 @@ namespace WebClinicSystem.Domain.Entities
 {
     public class Profissional
     {
-        public Guid Id { get; private set; }
+        public int ProfissionalId { get; private set; }
         public string NomeCompleto { get; private set; }
         public string Especialidade { get; private set; }
-
-        public Profissional(string nomeCompleto, string especialidade)
-        {
-            Id = Guid.NewGuid();
-            NomeCompleto = nomeCompleto;
-            Especialidade = especialidade;
-        }
+        // Novas propriedades do seu script.
+        public string RegistroConselho { get; private set; }
+        public string? Telefone { get; private set; }
+        public int? UsuarioId { get; private set; } // Chave estrangeira para a futura entidade Usuario.
     }
 }
