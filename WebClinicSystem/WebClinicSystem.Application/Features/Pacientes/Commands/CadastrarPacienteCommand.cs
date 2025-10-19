@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MediatR
+using MediatR;
 
 namespace WebClinicSystem.Application.Features.Pacientes.Commands
 {
@@ -15,5 +15,5 @@ namespace WebClinicSystem.Application.Features.Pacientes.Commands
         string NomeCompleto,
         string Cpf,
         DateTime DataNascimento,
-        string TelefoneContato) : IRequest<Guid>;
+        string TelefoneContato) : IRequest<int>;
 }

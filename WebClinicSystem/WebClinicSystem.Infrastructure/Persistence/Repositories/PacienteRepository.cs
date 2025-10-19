@@ -26,8 +26,13 @@ namespace WebClinicSystem.Infrastructure.Persistence.Repositories
             await _context.Pacientes.AddAsync(paciente);
         }
 
+        public async Task<IEnumerable<Paciente>> GetAllAsync()
+        {
+            // ToListAsync() executa a consulta no banco e retorna todos os registros da tabela Pacientes.
+            return await _context.Pacientes.ToListAsync();
+        }
         // Implementação do método para buscar um paciente pelo ID.
-        public async Task<Paciente> GetByIdAsync(Guid id)
+        public async Task<Paciente> GetByIdAsync(int id)
         {
             // FindAsync é um método otimizado do EF Core para buscar um item pela sua chave primária.
             return await _context.Pacientes.FindAsync(id);
