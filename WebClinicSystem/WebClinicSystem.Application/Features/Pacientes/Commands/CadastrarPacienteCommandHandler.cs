@@ -1,41 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
+using WebClinicSystem.Application.Features.Pacientes.Commands;
 using WebClinicSystem.Domain.Entities;
 using WebClinicSystem.Domain.Interfaces;
 
-namespace WebClinicSystem.Application.Feature.Pacientes.Commands
+public class CadastrarPacienteCommandHandler : IRequestHandler<CadastrarPacienteCommand, int>
 {
-    public class CadastrarPacienteCommandHandler : IRequestHandler<CadastrarPacienteCommand, Guid>
+    // Agora dependemos do IUnitOfWork, que é mais completo.
+    private readonly IUnitOfWork _unitOfWork;
+
+    public CadastrarPacienteCommandHandler(IUnitOfWork unitOfWork)
     {
-        // O handler depende da INTERFACE do repositório, não da implementação!
-        // Isso é a Inversão de Dependência (o 'D' do SOLID) em ação.
-        private readonly IPacienteRepository _pacienteRepository;
+        _unitOfWork = unitOfWork;
+    }
 
-        public CadastrarPacienteCommandHandler(IPacienteRepository pacienteRepository)
+    public async Task<int> Handle(CadastrarPacienteCommand request, CancellationToken cancellationToken)
+    {
+        var paciente = new Paciente
         {
-            _pacienteRepository = pacienteRepository;
-        }
+            NomeCompleto = request.NomeCompleto,
+            Cpf = request.Cpf,
+            DataNascimento = request.DataNascimento,
+            TelefoneContato = request.TelefoneContato,
+            DataCadastro = DateTime.UtcNow
+        };
 
-        public async Task<Guid> Handle(CadastrarPacienteCommand request, CancellationToken cancellationToken)
-        {
-            // 1. Cria a entidade de domínio com os dados do comando.
-            var paciente = new Paciente(
-                request.NomeCompleto,
-                request.Cpf,
-                request.DataNascimento,
-                request.TelefoneContato);
+        // Adicionamos o paciente usando o repositório DENTRO do Unit of Work.
+        await _unitOfWork.Pacientes.AddAsync(paciente);
 
-            // 2. Usa a abstração do repositório para adicionar o paciente.
-            await _pacienteRepository.AddAsync(paciente);
+        // Agora, chamamos o "caixa" para finalizar a compra e salvar TUDO no banco.
+        await _unitOfWork.CompleteAsync();
 
-            // 3. (Futuramente, aqui chamaremos o Unit of Work para salvar as alterações)
-
-            // 4. Retorna o ID da entidade recém-criada.
-            return paciente.Id;
-        }
+        return paciente.PacienteId;
     }
 }
