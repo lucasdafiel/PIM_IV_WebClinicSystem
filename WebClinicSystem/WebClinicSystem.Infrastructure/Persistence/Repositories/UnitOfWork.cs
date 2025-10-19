@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WebClinicSystem.Domain.Entities;
 using WebClinicSystem.Domain.Interfaces;
 
 namespace WebClinicSystem.Infrastructure.Persistence.Repositories
@@ -16,9 +17,11 @@ namespace WebClinicSystem.Infrastructure.Persistence.Repositories
         {
             _context = context;
             Pacientes = new PacienteRepository(_context);
+            Profissionais = new ProfissionalRepository(_context);
         }
 
         public IPacienteRepository Pacientes { get; private set; }
+        public IProfissionalRepository Profissionais { get; private set; }
 
         // O método 'CompleteAsync' simplesmente chama o SaveChangesAsync do DbContext.
         public async Task<int> CompleteAsync()
