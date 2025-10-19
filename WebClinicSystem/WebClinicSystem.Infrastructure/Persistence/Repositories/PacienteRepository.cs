@@ -37,5 +37,12 @@ namespace WebClinicSystem.Infrastructure.Persistence.Repositories
             // FindAsync é um método otimizado do EF Core para buscar um item pela sua chave primária.
             return await _context.Pacientes.FindAsync(id);
         }
+
+        // Implementação do método para deletar um paciente.
+        public void Delete(Paciente paciente)
+        {
+            // O método Remove do EF Core marca a entidade para ser excluída no banco.
+            _context.Pacientes.Remove(paciente);
+        }
     }
 }

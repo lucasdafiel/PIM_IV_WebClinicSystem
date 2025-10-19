@@ -61,4 +61,38 @@ public class PacientesController : ControllerBase
         var pacientes = await _mediator.Send(query);
         return Ok(pacientes);
     }
+
+    // --- Endpoint para Atualizar um Paciente Existente (PUT) ---
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> UpdatePaciente(int id, [FromBody] UpdatePacienteDto updatePacienteDto)
+    {
+        // Mapeia os dados da rota (id) e do corpo (DTO) para o comando.
+        var command = new UpdatePacienteCommand(
+            id,
+            updatePacienteDto.NomeCompleto,
+            updatePacienteDto.DataNascimento,
+            updatePacienteDto.TelefoneContato,
+            updatePacienteDto.Email
+        );
+
+        // Envia o comando para o MediatR.
+        await _mediator.Send(command);
+
+        // Retorna 204 No Content, que é a resposta padrão para uma atualização bem-sucedida.
+        return NoContent();
+    }
+
+    // --- Endpoint para Excluir um Paciente (DELETE) ---
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> DeletePaciente(int id)
+    {
+        // Cria o comando com o ID vindo da rota.
+        var command = new DeletePacienteCommand(id);
+
+        // Envia para o MediatR.
+        await _mediator.Send(command);
+
+        // Retorna 204 No Content, a resposta padrão para uma exclusão bem-sucedida.
+        return NoContent();
+    }
 }

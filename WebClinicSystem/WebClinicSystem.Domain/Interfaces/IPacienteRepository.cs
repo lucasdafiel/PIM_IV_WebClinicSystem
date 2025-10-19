@@ -12,6 +12,6 @@ namespace WebClinicSystem.Domain.Interfaces
         Task<Paciente> GetByIdAsync(int id);
         Task<IEnumerable<Paciente>> GetAllAsync();
         Task AddAsync(Paciente paciente);
-        // Outros métodos como Update, Delete, etc., serão adicionados aqui.
+        void Delete(Paciente paciente);
     }
 }
