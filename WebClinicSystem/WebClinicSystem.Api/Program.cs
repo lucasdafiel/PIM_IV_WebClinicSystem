@@ -3,7 +3,7 @@ using WebClinicSystem.Application.Features.Pacientes.Commands;
 using WebClinicSystem.Domain.Interfaces;
 using WebClinicSystem.Infrastructure.Persistence;
 using WebClinicSystem.Infrastructure.Persistence.Repositories;
-using WebClinicSystem.Domain.Interfaces;
+using WebClinicSystem.Infrastructure.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +14,8 @@ builder.Services.AddDbContext<WebClinicDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<CadastrarPacienteCommand>());
 

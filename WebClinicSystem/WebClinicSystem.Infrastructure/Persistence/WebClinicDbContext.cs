@@ -21,6 +21,14 @@ namespace WebClinicSystem.Infrastructure.Persistence
 
         // Mapeamos a entidade 'Profissional' para uma tabela chamada 'Profissionais'.
         public DbSet<Profissional> Profissionais { get; set; }
+        // Mapeamos a entidade 'Usuario' para uma tabela chamada 'Usuarios'.
+        public DbSet<Usuario> Usuarios { get; set; }
+        // Mapeamos a entidade 'Perfil' para uma tabela chamada 'Perfis'.
+        public DbSet<Perfil> Perfis { get; set; }
+        // Mapeamos a entidade 'Consulta' para uma tabela chamada 'Consultas'.
+        public DbSet<Consulta> Consultas { get; set; }
+        // Mapeamos a entidade 'Prontuario' para uma tabela chamada 'Prontuarios'.
+        public DbSet<Prontuario> Prontuarios { get; set; }
 
         // Poderíamos adicionar configurações mais detalhadas aqui no futuro.
         protected override void OnModelCreating(ModelBuilder modelBuilder)
