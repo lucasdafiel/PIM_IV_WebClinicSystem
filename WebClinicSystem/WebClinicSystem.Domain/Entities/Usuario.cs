@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace WebClinicSystem.Domain.Entities
 {
-    public class Perfil
+    public class Usuario
     {
-        // Chave primária da tabela Perfis.
+        public int UsuarioId { get; set; }
+        public string Email { get; set; }  
+        public string SenhaHash { get; set; }
+        public bool Ativo { get; set; }
         public int PerfilId { get; set; }
-
-        // Nome do perfil (ex: "Administrador").
-        public string Nome { get; set; }
     }
 }

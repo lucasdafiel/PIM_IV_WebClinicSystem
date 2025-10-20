@@ -22,6 +22,7 @@ namespace WebClinicSystem.Infrastructure.Persistence.Repositories
 
         public IPacienteRepository Pacientes { get; private set; }
         public IProfissionalRepository Profissionais { get; private set; }
+        public IUsuarioRepository Usuarios { get; private set; }
 
         // O método 'CompleteAsync' simplesmente chama o SaveChangesAsync do DbContext.
         public async Task<int> CompleteAsync()
