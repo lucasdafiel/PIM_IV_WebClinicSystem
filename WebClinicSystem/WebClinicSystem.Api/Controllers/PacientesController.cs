@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebClinicSystem.Application.Features.Pacientes.Commands;
 using WebClinicSystem.Application.Features.Pacientes.DTOs;
@@ -6,6 +7,7 @@ using WebClinicSystem.Application.Features.Pacientes.Queries;
 
 [ApiController] // Define que esta classe é um Controller de API.
 [Route("api/[controller]")] // Define a rota base como "api/pacientes".
+[Authorize] // Exige que o usuário esteja autenticado para acessar os endpoints.
 public class PacientesController : ControllerBase
 {
     // Dependência do MediatR para enviar comandos e queries para a camada de Application.

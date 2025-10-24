@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,13 @@ namespace WebClinicSystem.Infrastructure.Persistence.Repositories
         public async Task AddAsync(Usuario usuario)
         {
             await _context.Usuarios.AddAsync(usuario);
+        }
+
+        // Implementação do método para buscar um usuário pelo email.
+        public async Task<Usuario> GetByEmailAsync(string email)
+        {
+            // FirstOrDefaultAsync busca o primeiro usuário que corresponde ao email fornecido.
+            return await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
         }
     }
 }

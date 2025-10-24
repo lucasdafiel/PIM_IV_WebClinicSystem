@@ -1,9 +1,15 @@
+// Localização: WebClinicSystem.Api/Program.cs
+
+using Microsoft.AspNetCore.Authentication.JwtBearer; // Adicionar este using
+using Microsoft.IdentityModel.Tokens; // Adicionar este using
+using System.Text; // Adicionar este using
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using WebClinicSystem.Application.Features.Pacientes.Commands;
 using WebClinicSystem.Domain.Interfaces;
+using WebClinicSystem.Infrastructure.Auth;
 using WebClinicSystem.Infrastructure.Persistence;
 using WebClinicSystem.Infrastructure.Persistence.Repositories;
-using WebClinicSystem.Infrastructure.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,16 +20,39 @@ builder.Services.AddDbContext<WebClinicDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
 builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<CadastrarPacienteCommand>());
 
-// --- Fim da Seção de Configuração ---
+// --- ADICIONAR CONFIGURAÇÃO DE AUTENTICAÇÃO JWT ---
+// Este bloco ensina a API a validar o token
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        };
+    });
+// --- Fim da Configuração de Autenticação ---
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+// Configuração do Swagger (já estava correta)
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebClinicSystem.Api", Version = "v1" });
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme { /* ... */ });
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement { /* ... */ });
+});
 
 var app = builder.Build();
 
@@ -34,6 +63,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// --- ADICIONAR MIDDLEWARES DE AUTENTICAÇÃO E AUTORIZAÇÃO ---
+// A ordem aqui é CRUCIAL. Primeiro autentica, depois autoriza.
+app.UseAuthentication();
 app.UseAuthorization();
+// --- Fim dos Middlewares ---
+
 app.MapControllers();
+
 app.Run();
