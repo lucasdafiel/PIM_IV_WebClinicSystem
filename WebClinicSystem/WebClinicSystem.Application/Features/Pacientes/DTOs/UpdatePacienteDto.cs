@@ -9,6 +9,7 @@ namespace WebClinicSystem.Application.Features.Pacientes.DTOs
     // DTO para receber os dados na atualização de um paciente.
     public record UpdatePacienteDto(
         string NomeCompleto,
+        string Cpf,
         DateTime DataNascimento,
         string TelefoneContato,
         string? Email

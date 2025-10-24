@@ -29,8 +29,19 @@ namespace WebClinicSystem.Application.Features.Pacientes.Commands
                 throw new KeyNotFoundException("Paciente não encontrado.");
             }
 
+            // Verifica se o CPF está sendo alterado para um que já existe.
+            if (paciente.Cpf != request.Cpf)
+            {
+                var outroPacienteComCpf = await _unitOfWork.Pacientes.GetByCpfAsync(request.Cpf);
+                if (outroPacienteComCpf is not null)
+                {
+                    throw new InvalidOperationException("O CPF informado já está em uso por outro paciente.");
+                }
+            }
+
             // 3. Atualiza as propriedades do objeto que veio do banco.
             paciente.NomeCompleto = request.NomeCompleto;
+            paciente.Cpf = request.Cpf;
             paciente.DataNascimento = request.DataNascimento;
             paciente.TelefoneContato = request.TelefoneContato;
             paciente.Email = request.Email;

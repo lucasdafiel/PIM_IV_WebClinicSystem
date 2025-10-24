@@ -1,0 +1,121 @@
+@model List<Profissional>
+
+@{
+    ViewData["Title"] = "Gerenciamento de Profissionais";
+}
+
+<header class="pb-3 mb-4 border-bottom d-flex justify-content-between align-items-center">
+    <h1>Gerenciamento de Profissionais</h1>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#profissional-modal">
+        <i class="bi bi-plus-circle-fill me-2"></i>Adicionar Novo Profissional
+    </button>
+</header>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover" id="profissional-tabela">
+                <thead class="table-light">
+                    <tr>
+                        <th>Nome Completo</th>
+                        <th>Especialidade</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var profissional in Model)
+                    {
+                        <tr>
+                            <td>@profissional.NomeCompleto</td>
+                            <td>@profissional.Especialidade</td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-outline-secondary me-1 btn-editar" title="Editar">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger btn-excluir" title="Excluir">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="profissional-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Adicionar Novo Profissional</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="profissional-form">
+                    <div class="mb-3">
+                        <label class="form-label">Nome Completo</label>
+                        <input type="text" class="form-control" id="profissional-nome" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Especialidade</label>
+                        <input type="text" class="form-control" id="profissional-especialidade" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary" form="profissional-form">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Selecionando os elementos da página de Profissionais
+        const form = document.getElementById('profissional-form');
+        const tabela = document.getElementById('profissional-tabela');
+        const tabelaCorpo = tabela.querySelector('tbody');
+        const modalElement = document.getElementById('profissional-modal');
+        const modal = new bootstrap.Modal(modalElement);
+
+        // Lógica para ADICIONAR um novo profissional
+        if (form) {
+            form.addEventListener('submit', function (event) {
+                event.preventDefault();
+                const nome = document.getElementById('profissional-nome').value;
+                const especialidade = document.getElementById('profissional-especialidade').value;
+
+                const novaLinhaHtml = `
+                    <tr>
+                        <td>${nome}</td>
+                        <td>${especialidade}</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-secondary me-1 btn-editar" title="Editar"><i class="bi bi-pencil-square"></i></button>
+                            <button class="btn btn-sm btn-outline-danger btn-excluir" title="Excluir"><i class="bi bi-trash-fill"></i></button>
+                        </td>
+                    </tr>
+                `;
+                tabelaCorpo.insertAdjacentHTML('beforeend', novaLinhaHtml);
+                form.reset();
+                modal.hide();
+            });
+        }
+
+        // Lógica para EXCLUIR um profissional
+        if (tabelaCorpo) {
+            tabelaCorpo.addEventListener('click', function(event) {
+                const botaoExcluir = event.target.closest('.btn-excluir');
+                if (botaoExcluir) {
+                    if (confirm('Tem certeza que deseja excluir este profissional?')) {
+                        botaoExcluir.closest('tr').remove();
+                    }
+                }
+            });
+        }
+    });
+</script>
+}

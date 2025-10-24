@@ -72,6 +72,7 @@ public class PacientesController : ControllerBase
         var command = new UpdatePacienteCommand(
             id,
             updatePacienteDto.NomeCompleto,
+            updatePacienteDto.Cpf,
             updatePacienteDto.DataNascimento,
             updatePacienteDto.TelefoneContato,
             updatePacienteDto.Email

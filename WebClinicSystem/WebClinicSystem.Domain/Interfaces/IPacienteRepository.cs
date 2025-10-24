@@ -13,5 +13,6 @@ namespace WebClinicSystem.Domain.Interfaces
         Task<IEnumerable<Paciente>> GetAllAsync();
         Task AddAsync(Paciente paciente);
         void Delete(Paciente paciente);
+        Task<Paciente> GetByCpfAsync(string cpf);
     }
 }

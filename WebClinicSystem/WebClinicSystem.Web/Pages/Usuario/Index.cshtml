@@ -1,0 +1,113 @@
+@model List<Usuario>
+
+@{
+    ViewData["Title"] = "Gerenciamento de Usuários";
+}
+
+<header class="pb-3 mb-4 border-bottom d-flex justify-content-between align-items-center">
+    <h1>Gerenciamento de Usuários</h1>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#usuario-modal">
+        <i class="bi bi-plus-circle-fill me-2"></i>Adicionar Novo Usuário
+    </button>
+</header>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover" id="usuario-tabela">
+                <thead class="table-light">
+                    <tr>
+                        <th>E-mail de Acesso</th>
+                        <th>Perfil</th>
+                        <th class="text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var usuario in Model)
+                    {
+                        <tr>
+                            <td>@usuario.Email</td>
+                            <td>@usuario.Perfil</td>
+                            <td class="text-center">
+                                <button class="btn btn-sm btn-outline-secondary me-1 btn-editar" title="Editar"><i class="bi bi-pencil-square"></i></button>
+                                <button class="btn btn-sm btn-outline-danger btn-excluir" title="Excluir"><i class="bi bi-trash-fill"></i></button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="usuario-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Adicionar Novo Usuário</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="usuario-form">
+                    <div class="mb-3">
+                        <label class="form-label">E-mail</label>
+                        <input type="email" class="form-control" id="usuario-email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Perfil</label>
+                        <select class="form-select" id="usuario-perfil" required>
+                            <option value="" selected disabled>Selecione um perfil</option>
+                            <option value="Recepcionista">Recepcionista</option>
+                            <option value="Profissional de Saúde">Profissional de Saúde</option>
+                            <option value="Administrador">Administrador</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary" form="usuario-form">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('usuario-form');
+        const tabelaCorpo = document.getElementById('usuario-tabela').querySelector('tbody');
+        const modalElement = document.getElementById('usuario-modal');
+        const modal = new bootstrap.Modal(modalElement);
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const email = document.getElementById('usuario-email').value;
+            const perfil = document.getElementById('usuario-perfil').value;
+
+            const novaLinhaHtml = `
+                <tr>
+                    <td>${email}</td>
+                    <td>${perfil}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-secondary me-1 btn-editar" title="Editar"><i class="bi bi-pencil-square"></i></button>
+                        <button class="btn btn-sm btn-outline-danger btn-excluir" title="Excluir"><i class="bi bi-trash-fill"></i></button>
+                    </td>
+                </tr>
+            `;
+            tabelaCorpo.insertAdjacentHTML('beforeend', novaLinhaHtml);
+            form.reset();
+            modal.hide();
+        });
+
+        tabelaCorpo.addEventListener('click', function(event) {
+            const botaoExcluir = event.target.closest('.btn-excluir');
+            if (botaoExcluir) {
+                if (confirm('Tem certeza que deseja excluir este usuário?')) {
+                    botaoExcluir.closest('tr').remove();
+                }
+            }
+        });
+    });
+</script>
+}

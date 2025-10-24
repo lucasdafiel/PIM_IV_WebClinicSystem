@@ -1,5 +1,3 @@
-// Localização: WebClinicSystem.Api/Program.cs
-
 using Microsoft.AspNetCore.Authentication.JwtBearer; // Adicionar este using
 using Microsoft.IdentityModel.Tokens; // Adicionar este using
 using System.Text; // Adicionar este using
@@ -12,6 +10,18 @@ using WebClinicSystem.Infrastructure.Persistence;
 using WebClinicSystem.Infrastructure.Persistence.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: myAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("https://localhost:7155;http://localhost:5198")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                      });
+});
 
 // --- Início da Seção de Configuração ---
 

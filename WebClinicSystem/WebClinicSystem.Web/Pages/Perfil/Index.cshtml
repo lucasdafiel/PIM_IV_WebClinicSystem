@@ -1,0 +1,83 @@
+@{
+    ViewData["Title"] = "Meu Perfil";
+}
+
+<header class="pb-3 mb-4 border-bottom">
+    <h1>Meu Perfil</h1>
+</header>
+
+<div class="row">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h2 class="h5 mb-0">Alterar Senha</h2>
+            </div>
+            <div class="card-body">
+                <form id="form-alterar-senha">
+                    <div class="mb-3">
+                        <label for="senha-atual" class="form-label">Senha Atual</label>
+                        <input type="password" class="form-control" id="senha-atual" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="nova-senha" class="form-label">Nova Senha</label>
+                        <input type="password" class="form-control" id="nova-senha" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmar-senha" class="form-label">Confirmar Nova Senha</label>
+                        <input type="password" class="form-control" id="confirmar-senha" required>
+                    </div>
+                    
+                    <div id="feedback-container" class="mt-3"></div>
+
+                    <hr>
+
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save-fill me-2"></i>Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('form-alterar-senha');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const novaSenhaInput = document.getElementById('nova-senha');
+        const confirmarSenhaInput = document.getElementById('confirmar-senha');
+
+        // Função para mostrar mensagens
+        const exibirFeedback = (mensagem, tipo) => {
+            const classeAlerta = (tipo === 'sucesso') ? 'alert-success' : 'alert-danger';
+            feedbackContainer.innerHTML = `<div class="alert ${classeAlerta}" role="alert">${mensagem}</div>`;
+        };
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            feedbackContainer.innerHTML = ''; // Limpa mensagens antigas
+
+            const novaSenha = novaSenhaInput.value;
+            const confirmarSenha = confirmarSenhaInput.value;
+
+            // Validação de front-end
+            if (novaSenha.length < 6) {
+                exibirFeedback('A nova senha deve ter no mínimo 6 caracteres.', 'erro');
+                return;
+            }
+
+            if (novaSenha !== confirmarSenha) {
+                exibirFeedback('As novas senhas não coincidem. Tente novamente.', 'erro');
+                return;
+            }
+
+            // Simulação de sucesso (já que não temos back-end aqui)
+            exibirFeedback('Senha alterada com sucesso!', 'sucesso');
+            form.reset(); // Limpa o formulário
+        });
+    });
+</script>
+}

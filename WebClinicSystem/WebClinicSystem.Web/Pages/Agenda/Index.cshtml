@@ -1,0 +1,155 @@
+@{
+    ViewData["Title"] = "Agenda de Consultas";
+}
+
+<header class="pb-3 mb-4 border-bottom d-flex justify-content-between align-items-center">
+    <h1 class="mb-0">Agenda de Consultas</h1>
+    <button class="btn btn-primary">
+        <i class="bi bi-plus-lg me-2"></i>Nova Consulta
+    </button>
+</header>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <div id="calendario"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="nova-consulta-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Agendar Nova Consulta</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="form-nova-consulta">
+                    <div class="mb-3">
+                        <label for="modal-paciente-nome" class="form-label">Paciente</label>
+                        <input type="text" class="form-control" id="modal-paciente-nome" placeholder="Digite para buscar o paciente..." required>
+                        </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="modal-data" class="form-label">Data</label>
+                            <input type="date" class="form-control" id="modal-data" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="modal-hora" class="form-label">Hora</label>
+                            <input type="time" class="form-control" id="modal-hora" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary" form="form-nova-consulta">Confirmar Agendamento</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css' rel='stylesheet' />
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/@@fullcalendar/core/locales/pt-br.global.js'></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- SELEÇÃO DOS ELEMENTOS ---
+            var calendarEl = document.getElementById('calendario');
+            var modalElement = document.getElementById('nova-consulta-modal');
+            var consultaModal = new bootstrap.Modal(modalElement);
+            var consultaForm = document.getElementById('form-nova-consulta');
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'timeGridWeek',
+                locale: 'pt-br',
+
+                // --- CONFIGURAÇÕES DO CABEÇALHO (CORRIGIDO) ---
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                buttonText: {
+                    today: 'Hoje',
+                    month: 'Mês',
+                    week: 'Semana',
+                    day: 'Dia'
+                },
+                dayHeaderContent: function(arg) {
+                    let texto = arg.text.replace('.', '');
+                    return texto.charAt(0).toUpperCase() + texto.slice(1);
+                },
+                
+                // --- FUNCIONALIDADE DE CLICAR NO CALENDÁRIO ---
+                selectable: true,
+                dateClick: function(info) {
+                    consultaForm.reset();
+                    const dataClicada = info.date;
+                    document.getElementById('modal-data').value = dataClicada.toISOString().slice(0, 10);
+                    document.getElementById('modal-hora').value = dataClicada.toTimeString().slice(0, 5);
+                    consultaModal.show();
+                },
+
+                // --- EVENTOS DE EXEMPLO ---
+                events: [
+                    {
+                        title: 'João Silva',
+                        start: '2025-10-13T10:30:00', end: '2025-10-13T11:00:00',
+                        extendedProps: { doctor: 'Dr. Carlos', type: 'Consulta' }
+                    },
+                    {
+                        title: 'Maria Santos',
+                        start: '2025-10-14T09:00:00', end: '2025-10-14T09:30:00',
+                        extendedProps: { doctor: 'Dr. Ana', type: 'Retorno' }
+                    }
+                ],
+
+                // --- FUNÇÃO PARA DESENHAR OS DETALHES DENTRO DO EVENTO ---
+                eventContent: function(arg) {
+                    let eventTime = arg.timeText;
+                    let eventTitle = arg.event.title;
+                    let eventDoctor = arg.event.extendedProps.doctor;
+                    let eventType = arg.event.extendedProps.type;
+
+                    let eventHtml = `
+                        <div class="event-details">
+                            <div class="event-time">${eventTime} - <strong>${eventTitle}</strong></div>
+                            <div class="event-doctor">${eventDoctor}</div>
+                            <span class="badge event-type">${eventType}</span>
+                        </div>
+                    `;
+                    return { html: eventHtml };
+                }
+            });
+
+            // --- LÓGICA PARA CONFIRMAR O AGENDAMENTO ---
+            consultaForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                const nomePaciente = document.getElementById('modal-paciente-nome').value;
+                const data = document.getElementById('modal-data').value;
+                const hora = document.getElementById('modal-hora').value;
+
+                const inicio = new Date(`${data}T${hora}`);
+                const fim = new Date(inicio.getTime() + 30 * 60000);
+
+                // --- ADICIONA O NOVO EVENTO COM TODOS OS DETALHES (CORRIGIDO) ---
+                calendar.addEvent({
+                    title: nomePaciente,
+                    start: inicio,
+                    end: fim,
+                    extendedProps: {
+                        doctor: 'Dr. Logado', // Dados de exemplo
+                        type: 'Nova Consulta'  // Dados de exemplo
+                    }
+                });
+
+                consultaModal.hide();
+            });
+
+            calendar.render();
+        });
+    </script>
+}
