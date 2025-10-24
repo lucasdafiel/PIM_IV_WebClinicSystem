@@ -15,6 +15,15 @@ public class CadastrarPacienteCommandHandler : IRequestHandler<CadastrarPaciente
 
     public async Task<int> Handle(CadastrarPacienteCommand request, CancellationToken cancellationToken)
     {
+        var pacienteExistente = await _unitOfWork.Pacientes.GetByCpfAsync(request.Cpf);
+
+        if (pacienteExistente is not null)
+        {
+            // Lança uma exceção se o CPF já estiver em uso.
+            // O controller irá capturar isso e retornar um erro 400 (Bad Request).
+            throw new InvalidOperationException("O CPF informado já está cadastrado no sistema.");
+        }
+
         var paciente = new Paciente
         {
             NomeCompleto = request.NomeCompleto,

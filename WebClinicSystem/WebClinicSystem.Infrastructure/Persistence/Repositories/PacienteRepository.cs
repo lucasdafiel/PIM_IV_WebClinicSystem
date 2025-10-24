@@ -44,5 +44,13 @@ namespace WebClinicSystem.Infrastructure.Persistence.Repositories
             // O método Remove do EF Core marca a entidade para ser excluída no banco.
             _context.Pacientes.Remove(paciente);
         }
+
+        // Implementação do método para buscar um paciente pelo CPF.
+        public async Task<Paciente> GetByCpfAsync(string cpf)
+        {
+            // FirstOrDefaultAsync retorna o primeiro paciente que encontrar com o CPF
+            // ou null se não encontrar nenhum.
+            return await _context.Pacientes.FirstOrDefaultAsync(p => p.Cpf == cpf);
+        }
     }
 }

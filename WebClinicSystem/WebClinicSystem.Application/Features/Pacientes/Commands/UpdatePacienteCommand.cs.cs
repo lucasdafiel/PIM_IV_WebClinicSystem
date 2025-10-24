@@ -11,6 +11,7 @@ namespace WebClinicSystem.Application.Features.Pacientes.Commands
     public record UpdatePacienteCommand(
         int PacienteId,
         string NomeCompleto,
+        string Cpf,
         DateTime DataNascimento,
         string TelefoneContato,
         string? Email) : IRequest;

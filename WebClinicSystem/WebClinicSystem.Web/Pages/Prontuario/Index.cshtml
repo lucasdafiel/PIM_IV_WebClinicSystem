@@ -1,0 +1,111 @@
+@{
+    ViewData["Title"] = "Prontuário Eletrônico";
+}
+
+<header class="pb-3 mb-4 border-bottom">
+    <h1>Prontuário Eletrônico</h1>
+</header>
+
+<div class="card shadow-sm mb-4" id="cabecalho-paciente">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="card-title mb-1">Nome do Paciente</h5>
+                <p class="card-text text-muted">Carlos Pereira da Silva</p>
+            </div>
+            <div class="col-md-3">
+                <h6 class="card-subtitle mb-1 text-muted">Idade</h6>
+                <p class="card-text">40 anos</p>
+            </div>
+            <div class="col-md-3">
+                <h6 class="card-subtitle mb-1 text-muted">CPF</h6>
+                <p class="card-text">123.456.789-00</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Nova Evolução</h5>
+    </div>
+    <div class="card-body">
+        <form id="form-anotacao">
+            <div class="mb-3">
+                <label for="nova-anotacao" class="form-label">Descreva a evolução do paciente:</label>
+                <textarea class="form-control" id="nova-anotacao" rows="5" placeholder="Digite aqui..." required></textarea>
+            </div>
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-check-circle me-2"></i>Salvar Anotação
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<h2 class="pb-2 mb-3 border-bottom">Histórico de Atendimentos</h2>
+<div id="historico-container">
+    <div class="card shadow-sm mb-3 history-item">
+        <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+                <h6 class="card-subtitle text-muted">Atendimento em: 09/10/2025</h6>
+                <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill">Dr.ª Ana Costa</span>
+            </div>
+            <p class="card-text">Paciente relata melhora significativa na dor lombar. Recomenda-se a continuação dos exercícios em casa.</p>
+        </div>
+    </div>
+     <div class="card shadow-sm mb-3 history-item">
+        <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+                <h6 class="card-subtitle text-muted">Atendimento em: 25/09/2025</h6>
+                <span class="badge bg-primary-subtle text-primary-emphasis rounded-pill">Dr.ª Ana Costa</span>
+            </div>
+            <p class="card-text">Primeira consulta. Paciente apresenta queixa de dor lombar crônica. Solicitados exames de imagem.</p>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const formAnotacao = document.getElementById('form-anotacao');
+        const historicoContainer = document.getElementById('historico-container');
+        const novaAnotacaoTextarea = document.getElementById('nova-anotacao');
+
+        formAnotacao.addEventListener('submit', function(event) {
+            // Impede que a página recarregue
+            event.preventDefault();
+
+            const textoAnotacao = novaAnotacaoTextarea.value.trim();
+
+            // Se o usuário escreveu algo...
+            if (textoAnotacao) {
+                // Pega a data de hoje e formata
+                const hoje = new Date();
+                const dataFormatada = hoje.toLocaleDateString('pt-BR');
+
+                // Cria o HTML para o novo card de histórico
+                const novoItemHtml = `
+                    <div class="card shadow-sm mb-3 history-item">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2">
+                                <h6 class="card-subtitle text-muted">Atendimento em: ${dataFormatada}</h6>
+                                <span class="badge bg-success-subtle text-success-emphasis rounded-pill">Dr. Logado</span>
+                            </div>
+                            <p class="card-text">${textoAnotacao}</p>
+                        </div>
+                    </div>
+                `;
+
+                // Insere o novo item no início da lista do histórico
+                historicoContainer.insertAdjacentHTML('afterbegin', novoItemHtml);
+
+                // Limpa o campo de texto
+                novaAnotacaoTextarea.value = '';
+            }
+        });
+    });
+</script>
+}
