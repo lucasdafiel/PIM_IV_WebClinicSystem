@@ -1,11 +1,13 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebClinicSystem.Application.Features.Profissionais.Commands;
 using WebClinicSystem.Application.Features.Profissionais.DTOs;
 using WebClinicSystem.Application.Features.Profissionais.Queries;
 
-[ApiController]
-[Route("api/[controller]")]
+[ApiController] // Define que esta classe é um controlador de API
+[Route("api/[controller]")] // Define a rota base como "api/profissionais"
+[Authorize] // Exige que o usuário esteja autenticado para acessar os endpoints
 public class ProfissionaisController : ControllerBase
 {
     private readonly ISender _mediator;

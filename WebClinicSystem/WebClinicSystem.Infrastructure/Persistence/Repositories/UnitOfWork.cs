@@ -18,6 +18,7 @@ namespace WebClinicSystem.Infrastructure.Persistence.Repositories
             _context = context;
             Pacientes = new PacienteRepository(_context);
             Profissionais = new ProfissionalRepository(_context);
+            Usuarios = new UsuarioRepository(_context);
         }
 
         public IPacienteRepository Pacientes { get; private set; }
