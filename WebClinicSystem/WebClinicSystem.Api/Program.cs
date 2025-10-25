@@ -17,7 +17,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy(name: myAllowSpecificOrigins,
                       policy =>
                       {
-                          policy.WithOrigins("https://localhost:7155;http://localhost:5198")
+                          policy.WithOrigins("https://localhost:7155")
                                 .AllowAnyHeader()
                                 .AllowAnyMethod();
                       });
@@ -99,7 +99,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// --- ADICIONAR MIDDLEWARES DE AUTENTICAÇÃO E AUTORIZAÇÃO ---
+app.UseCors(myAllowSpecificOrigins);    
+
 // A ordem aqui é CRUCIAL. Primeiro autentica, depois autoriza.
 app.UseAuthentication();
 app.UseAuthorization();
