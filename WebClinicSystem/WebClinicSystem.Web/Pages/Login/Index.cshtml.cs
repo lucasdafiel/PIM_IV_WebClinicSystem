@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Net.Http;
-using System.Text;
+using System.ComponentModel.DataAnnotations;
+using System.Net.Http.Json;
 using System.Text.Json;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
 namespace WebClinicSystem.Web.Pages.Login
 {
@@ -12,69 +10,78 @@ namespace WebClinicSystem.Web.Pages.Login
     {
         private readonly IHttpClientFactory _httpClientFactory;
 
-        [BindProperty] // Liga esta propriedade aos campos do formulário no HTML
-        public LoginInputModel Input { get; set; }
+        // Propriedade que irá receber os dados do formulário
+        [BindProperty]
+        public InputModel Input { get; set; }
 
+        // Classe que representa os campos do formulário
+        public class InputModel
+        {
+            [Required(ErrorMessage = "O campo Email é obrigatório.")]
+            [EmailAddress(ErrorMessage = "O Email não é um endereço válido.")]
+            public string Email { get; set; }
+
+            [Required(ErrorMessage = "O campo Senha é obrigatório.")]
+            [DataType(DataType.Password)]
+            public string Senha { get; set; }
+        }
+
+        // Construtor para injetar o HttpClientFactory que configuramos no Passo 1
         public IndexModel(IHttpClientFactory httpClientFactory)
         {
             _httpClientFactory = httpClientFactory;
         }
 
+        // Este método é executado quando a página é carregada via GET (primeiro acesso)
         public void OnGet()
         {
-            // Apenas exibe a página de login
         }
 
-        // Este método é chamado quando o formulário é enviado (POST)
+        // ESTE MÉTODO É O MAIS IMPORTANTE
+        // Ele é executado quando o usuário clica no botão "Entrar" (POST)
         public async Task<IActionResult> OnPostAsync()
         {
+            // Verifica se os campos foram preenchidos corretamente (ex: email é um email válido)
             if (!ModelState.IsValid)
             {
-                return Page();
+                return Page(); // Se não for válido, recarrega a página para mostrar os erros
             }
 
+            // Cria um cliente HTTP para chamar nossa API
             var httpClient = _httpClientFactory.CreateClient();
-            // ATENÇÃO: Verifique se a porta da sua API está correta aqui!
-            // No seu launchSettings.json da API, a porta do perfil "https" é 7106.
-            var apiAddress = "https://localhost:7106";
 
-            var loginDto = new { Email = Input.Email, Password = Input.Password };
-            var jsonContent = new StringContent(JsonSerializer.Serialize(loginDto), Encoding.UTF8, "application/json");
+            // Monta o objeto com os dados de login para enviar à API
+            var loginData = new { email = Input.Email, password = Input.Senha };
 
-            var response = await httpClient.PostAsync($"{apiAddress}/api/auth/login", jsonContent);
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var responseBody = await response.Content.ReadAsStringAsync();
-                var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(responseBody, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                // Envia os dados para o endpoint de login da sua API
+                // ATENÇÃO: Verifique se a porta :7013 é a porta correta da sua API. 
+                // Você pode conferir isso no arquivo Properties/launchSettings.json do projeto da API.
+                var response = await httpClient.PostAsJsonAsync("https://localhost:7013/api/auth/login", loginData);
 
-                // LINHA CORRIGIDA
-                HttpContext.Response.Cookies.Append("AuthToken", tokenResponse.Token, new CookieOptions
+                // Se a API retornou sucesso (Status 200 OK)
+                if (response.IsSuccessStatusCode)
                 {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.Strict
-                });
+                    // Lógica para armazenar o token (será feita em um próximo passo)
 
-                return RedirectToPage("/Home/Dashboard");
+                    // COMANDO DE REDIRECIONAMENTO:
+                    // Se o login deu certo, redireciona para a página principal (Dashboard)
+                    return RedirectToPage("/Index");
+                }
+                else
+                {
+                    // Se a API retornou um erro (ex: usuário ou senha inválidos)
+                    ModelState.AddModelError(string.Empty, "Login inválido. Verifique suas credenciais.");
+                    return Page(); // Recarrega a página de login para mostrar o erro
+                }
             }
-            else
+            catch (HttpRequestException)
             {
-                ModelState.AddModelError(string.Empty, "Login inválido. Verifique suas credenciais.");
+                // Se não conseguiu nem se conectar à API (ex: API não está rodando)
+                ModelState.AddModelError(string.Empty, "Não foi possível conectar ao servidor. Tente novamente mais tarde.");
                 return Page();
             }
         }
-    }
-
-    // Classes auxiliares para o formulário e para receber o token
-    public class LoginInputModel
-    {
-        public string Email { get; set; }
-        public string Password { get; set; }
-    }
-
-    public class TokenResponse
-    {
-        public string Token { get; set; }
     }
 }
