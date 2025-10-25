@@ -11,18 +11,6 @@ using WebClinicSystem.Infrastructure.Persistence.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: myAllowSpecificOrigins,
-                      policy =>
-                      {
-                          policy.WithOrigins("https://localhost:7155")
-                                .AllowAnyHeader()
-                                .AllowAnyMethod();
-                      });
-});
-
 // --- Início da Seção de Configuração ---
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -54,6 +42,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // --- Fim da Configuração de Autenticação ---
 
 builder.Services.AddControllers();
+
+var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: myAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("https://localhost:7155")
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                      });
+});
+
 builder.Services.AddEndpointsApiExplorer();
 
 // Configuração do Swagger (já estava correta)
@@ -101,10 +102,10 @@ app.UseHttpsRedirection();
 
 app.UseCors(myAllowSpecificOrigins);    
 
-// A ordem aqui é CRUCIAL. Primeiro autentica, depois autoriza.
+
 app.UseAuthentication();
 app.UseAuthorization();
-// --- Fim dos Middlewares ---
+
 
 app.MapControllers();
 

@@ -1,29 +1,36 @@
 @page
 @model WebClinicSystem.Web.Pages.Login.IndexModel
 @{
+    // Define que esta página usará o layout de login, e não o principal
+    Layout = "Shared/_LoginLayout";
     ViewData["Title"] = "Login";
 }
 
-<h1>Login</h1>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Input.Email" class="control-label"></label>
-                <input asp-for="Input.Email" class="form-control" />
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Input.Password" class="control-label"></label>
-                <input asp-for="Input.Password" type="password" class="form-control" />
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-            <br />
-            <div class="form-group">
-                <input type="submit" value="Entrar" class="btn btn-primary" />
-            </div>
-        </form>
+<div class="login-card">
+    <div class="login-logo-container">
+        <i class="fa-solid fa-heart-pulse"></i>
     </div>
-</div> 
+
+    <div class="text-center mb-4">
+        <h3 class="mb-1">Bem-Vindo !</h3>
+        <p class="text-muted">Faça login para acessar o sistema.</p>
+    </div>
+
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+    <form method="post">
+        <div class="mb-3">
+            <label asp-for="Input.Email" class="form-label">Email</label>
+            <input asp-for="Input.Email" class="form-control" placeholder="seuemail@exemplo.com">
+        </div>
+
+        <div class="mb-4">
+            <label asp-for="Input.Senha" class="form-label">Senha</label>
+            <input asp-for="Input.Senha" class="form-control" placeholder="Sua senha">
+        </div>
+
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary">Entrar</button>
+        </div>
+    </form>
+</div>
