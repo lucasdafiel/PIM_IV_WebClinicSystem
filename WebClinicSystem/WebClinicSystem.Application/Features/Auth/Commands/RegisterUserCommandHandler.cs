@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using WebClinicSystem.Domain.Entities;
 using WebClinicSystem.Domain.Interfaces;
+using Microsoft.AspNetCore.Identity;
 
 namespace WebClinicSystem.Application.Features.Auth.Commands
 {
@@ -25,7 +26,7 @@ namespace WebClinicSystem.Application.Features.Auth.Commands
             // 1. Criptografa a senha recebida usando nosso serviço de autenticação.
             var passwordHash = _authService.ComputeSha256Hash(request.Password);
 
-            // 2. Cria a nova entidade Usuario.
+            // 2. Cria a nova entidade Usuario.x'
             var user = new Usuario
             {
                 Email = request.Email,

@@ -1,30 +1,72 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer; // Adicionar este using
-using Microsoft.IdentityModel.Tokens; // Adicionar este using
-using System.Text; // Adicionar este using
+// Importações necessárias para o funcionamento da aplicação.
+using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-using WebClinicSystem.Application.Features.Pacientes.Commands;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using WebClinicSystem.Application.Features.Auth.Commands;
 using WebClinicSystem.Domain.Interfaces;
 using WebClinicSystem.Infrastructure.Auth;
 using WebClinicSystem.Infrastructure.Persistence;
 using WebClinicSystem.Infrastructure.Persistence.Repositories;
 
+// Cria o construtor da aplicação web.
 var builder = WebApplication.CreateBuilder(args);
 
-// --- Início da Seção de Configuração ---
+// --- INÍCIO DA SOLUÇÃO ---
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<WebClinicDbContext>(options =>
-    options.UseSqlServer(connectionString));
+// Define um nome para a nossa política de CORS para facilitar a referência.
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+// Adiciona o serviço de CORS (Cro ss-Origin Resource Sharing).
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+                      policy =>
+                      {
+                          // Obtém a URL da aplicação Web a partir do arquivo de configuração.
+                          // Isso é mais flexível do que colocar a URL diretamente no código.
+                          var webAppUrl = builder.Configuration.GetValue<string>("WebAppUrl");
+
+                          // Permite que a aplicação Web (ex: https://localhost:7198)
+                          // se comunique com esta API.
+                          policy.WithOrigins(webAppUrl)
+                                .AllowAnyHeader()  // Permite qualquer cabeçalho na requisição (ex: Content-Type).
+                                .AllowAnyMethod(); // Permite qualquer método HTTP (GET, POST, PUT, DELETE).
+                      });
+});
+
+// --- FIM DA SOLUÇÃO ---
+
+// Adiciona os serviços de controllers para a aplicação.
+builder.Services.AddControllers();
+
+// Configura o Entity Framework Core para usar o SQL Server.
+// A string de conexão é lida do arquivo appsettings.json.
+builder.Services.AddDbContext<WebClinicDbContext>(
+    options => options.UseSqlServer(builder.Configuration.GetConnectionString("WebClinicSystemCs"))
+);
+
+// Adiciona os serviços do MediatR para implementar o padrão CQRS.
+// Ele vai escanear o assembly da aplicação em busca de handlers de comandos e queries.
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<RegisterUserCommand>());
+
+// Injeção de Dependência: Registra as interfaces e suas implementações concretas.
+// Isso permite que a aplicação seja mais desacoplada e testável.
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
+builder.Services.AddScoped<IProfissionalRepository, ProfissionalRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<CadastrarPacienteCommand>());
+// Configura o Swagger/OpenAPI para documentação da API.
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
-// --- ADICIONAR CONFIGURAÇÃO DE AUTENTICAÇÃO JWT ---
-// Este bloco ensina a API a validar o token
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+// Configuração da autenticação JWT (JSON Web Token).
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -34,64 +76,18 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
 
+            // Configurações de validação do token, lidas do appsettings.json.
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
         };
     });
-// --- Fim da Configuração de Autenticação ---
 
-builder.Services.AddControllers();
-
-var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(name: myAllowSpecificOrigins,
-                      policy =>
-                      {
-                          policy.WithOrigins("https://localhost:7155")
-                                .AllowAnyHeader()
-                                .AllowAnyMethod();
-                      });
-});
-
-builder.Services.AddEndpointsApiExplorer();
-
-// Configuração do Swagger (já estava correta)
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebClinicSystem.Api", Version = "v1" });
-
-    // Definição de segurança para o Swagger: informa que a API usa Bearer Token (JWT).
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Description = "Insira o token JWT no formato: Bearer {seu_token}",
-        Name = "Authorization",
-        In = ParameterLocation.Header,
-        Type = SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
-    });
-
-    // Adiciona o requisito de segurança a todas as operações,
-    // fazendo com que o Swagger envie o token em cada requisição.
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[] {}
-        }
-    });
-});
-
+// Constrói a aplicação.
 var app = builder.Build();
 
+// Configura o pipeline de requisições HTTP.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -100,13 +96,17 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors(myAllowSpecificOrigins);    
+// --- INÍCIO DA SOLUÇÃO ---
 
+// Manda a aplicação USAR a política de CORS que definimos acima.
+// Isso deve vir antes de UseAuthorization e MapControllers.
+app.UseCors(MyAllowSpecificOrigins);
 
-app.UseAuthentication();
-app.UseAuthorization();
+// --- FIM DA SOLUÇÃO ---
 
+app.UseAuthentication(); // Adiciona o middleware de autenticação.
+app.UseAuthorization();  // Adiciona o middleware de autorização.
 
-app.MapControllers();
+app.MapControllers(); // Mapeia os controllers para as rotas.
 
-app.Run();
+app.Run(); // Executa a aplicação.

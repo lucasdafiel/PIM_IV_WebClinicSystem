@@ -1,24 +1,41 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace WebClinicSystem.Web.Pages.Login
 {
+    // Representa a resposta que esperamos receber da API após um login bem-sucedido.
+    public class LoginResponse
+    {
+        // A propriedade "token" no JSON de resposta será mapeada para esta propriedade.
+        public string Token { get; set; }
+    }
+
     public class IndexModel : PageModel
     {
+        // Serviço para fazer chamadas HTTP para a nossa API.
         private readonly IHttpClientFactory _httpClientFactory;
 
-        // Propriedade que irá receber os dados do formulário
+        // Construtor que recebe o serviço IHttpClientFactory por injeção de dependência.
+        public IndexModel(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
+
+        // [BindProperty] faz com que os dados do formulário da página de login
+        // sejam automaticamente mapeados para esta propriedade.
         [BindProperty]
         public InputModel Input { get; set; }
 
-        // Classe que representa os campos do formulário
+        // Classe que define os campos do nosso formulário de login.
         public class InputModel
         {
             [Required(ErrorMessage = "O campo Email é obrigatório.")]
-            [EmailAddress(ErrorMessage = "O Email não é um endereço válido.")]
+            [EmailAddress(ErrorMessage = "O formato do email é inválido.")]
             public string Email { get; set; }
 
             [Required(ErrorMessage = "O campo Senha é obrigatório.")]
@@ -26,60 +43,88 @@ namespace WebClinicSystem.Web.Pages.Login
             public string Senha { get; set; }
         }
 
-        // Construtor para injetar o HttpClientFactory que configuramos no Passo 1
-        public IndexModel(IHttpClientFactory httpClientFactory)
-        {
-            _httpClientFactory = httpClientFactory;
-        }
-
-        // Este método é executado quando a página é carregada via GET (primeiro acesso)
+        // Método executado quando a página é acessada pela primeira vez (via GET).
         public void OnGet()
         {
+            // Nenhuma ação necessária aqui.
         }
 
-        // ESTE MÉTODO É O MAIS IMPORTANTE
-        // Ele é executado quando o usuário clica no botão "Entrar" (POST)
+        // Método executado quando o formulário de login é enviado (via POST).
         public async Task<IActionResult> OnPostAsync()
         {
-            // Verifica se os campos foram preenchidos corretamente (ex: email é um email válido)
+            // Verifica se os dados do formulário são válidos (ex: campos obrigatórios preenchidos).
             if (!ModelState.IsValid)
             {
-                return Page(); // Se não for válido, recarrega a página para mostrar os erros
+                return Page(); // Se inválido, recarrega a página para exibir os erros de validação.
             }
 
-            // Cria um cliente HTTP para chamar nossa API
+            // Cria um cliente HTTP para se comunicar com a API.
             var httpClient = _httpClientFactory.CreateClient();
 
-            // Monta o objeto com os dados de login para enviar à API
+            // Cria um objeto anônimo com os dados de login no formato que a API espera.
             var loginData = new { email = Input.Email, password = Input.Senha };
 
             try
             {
-                // Envia os dados para o endpoint de login da sua API
-                // ATENÇÃO: Verifique se a porta :7013 é a porta correta da sua API. 
-                // Você pode conferir isso no arquivo Properties/launchSettings.json do projeto da API.
+                // Envia a requisição POST para o endpoint de login da API.
+                // A URL da API deve ser a mesma configurada no launchSettings.json do projeto da API.
                 var response = await httpClient.PostAsJsonAsync("https://localhost:7013/api/auth/login", loginData);
 
-                // Se a API retornou sucesso (Status 200 OK)
+                // Verifica se a API retornou um código de sucesso (2xx).
                 if (response.IsSuccessStatusCode)
                 {
-                    // Lógica para armazenar o token (será feita em um próximo passo)
+                    // Lê o corpo da resposta como uma string JSON.
+                    var responseBody = await response.Content.ReadAsStringAsync();
 
-                    // COMANDO DE REDIRECIONAMENTO:
-                    // Se o login deu certo, redireciona para a página principal (Dashboard)
-                    return RedirectToPage("/Index");
+                    // Converte a string JSON para o nosso objeto LoginResponse,
+                    // permitindo que acessemos o token.
+                    var loginResponse = JsonSerializer.Deserialize<LoginResponse>(responseBody, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true // Ignora se o "token" no JSON é maiúsculo ou minúsculo.
+                    });
+
+                    // --- ARMAZENAMENTO DO TOKEN ---
+                    if (!string.IsNullOrEmpty(loginResponse?.Token))
+                    {
+                        // Configura as opções do cookie.
+                        var cookieOptions = new CookieOptions
+                        {
+                            // HttpOnly: O cookie não pode ser acessado por scripts do lado do cliente (JavaScript),
+                            // o que previne ataques de XSS (Cross-Site Scripting). É uma medida de segurança crucial.
+                            HttpOnly = true,
+                            // Secure: O cookie só será enviado em requisições HTTPS.
+                            Secure = true,
+                            // SameSite.Strict: O cookie só será enviado se a requisição se originar do mesmo site.
+                            // Ajuda a prevenir ataques CSRF (Cross-Site Request Forgery).
+                            SameSite = SameSiteMode.Strict,
+                            // Define um tempo de expiração para o cookie (ex: 1 hora).
+                            Expires = DateTime.UtcNow.AddHours(1)
+                        };
+
+                        // Adiciona o token ao cookie na resposta que será enviada ao navegador do usuário.
+                        Response.Cookies.Append("AuthToken", loginResponse.Token, cookieOptions);
+
+                        // Se o login foi bem-sucedido e o token foi armazenado,
+                        // redireciona o usuário para a página principal (Dashboard).
+                        return RedirectToPage("/Index");
+                    }
+
+                    // Se a API retornou sucesso, mas não enviou um token, mostra um erro.
+                    ModelState.AddModelError(string.Empty, "Resposta de autenticação inválida do servidor.");
+                    return Page();
                 }
                 else
                 {
-                    // Se a API retornou um erro (ex: usuário ou senha inválidos)
-                    ModelState.AddModelError(string.Empty, "Login inválido. Verifique suas credenciais.");
-                    return Page(); // Recarrega a página de login para mostrar o erro
+                    // Se a API retornou um erro (ex: 400 Bad Request para credenciais inválidas),
+                    // adiciona uma mensagem de erro genérica para o usuário.
+                    ModelState.AddModelError(string.Empty, "Credenciais inválidas. Tente novamente.");
+                    return Page();
                 }
             }
             catch (HttpRequestException)
             {
-                // Se não conseguiu nem se conectar à API (ex: API não está rodando)
-                ModelState.AddModelError(string.Empty, "Não foi possível conectar ao servidor. Tente novamente mais tarde.");
+                // Se ocorreu um erro de rede (ex: a API não está rodando), mostra um erro de conexão.
+                ModelState.AddModelError(string.Empty, "Não foi possível conectar ao servidor de autenticação.");
                 return Page();
             }
         }
