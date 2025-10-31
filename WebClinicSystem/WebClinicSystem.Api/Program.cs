@@ -19,23 +19,28 @@ var builder = WebApplication.CreateBuilder(args);
 // Define um nome para a nossa política de CORS para facilitar a referência.
 var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
-// Adiciona o serviço de CORS (Cro ss-Origin Resource Sharing).
+// Adiciona o serviço de CORS (Cross-Origin Resource Sharing).
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       policy =>
                       {
-                          // Obtém a URL da aplicação Web a partir do arquivo de configuração.
-                          // Isso é mais flexível do que colocar a URL diretamente no código.
-                          var webAppUrl = builder.Configuration.GetValue<string>("WebAppUrl");
+                          // Lê a LISTA de URLs permitidas do arquivo de configuração.
+                          // O método GetSection("AllowedOrigins").Get<string[]>() busca a seção
+                          // e a converte em um array de strings.
+                          var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>();
 
-                          // Permite que a aplicação Web (ex: https://localhost:7198)
-                          // se comunique com esta API.
-                          policy.WithOrigins(webAppUrl)
-                                .AllowAnyHeader()  // Permite qualquer cabeçalho na requisição (ex: Content-Type).
-                                .AllowAnyMethod(); // Permite qualquer método HTTP (GET, POST, PUT, DELETE).
+                          // Valida se a configuração foi encontrada para evitar erros.
+                          if (allowedOrigins != null && allowedOrigins.Length > 0)
+                          {
+                              // Permite que TODAS as origens listadas no appsettings
+                              // se comuniquem com esta API.
+                              policy.WithOrigins(allowedOrigins)
+                                    .AllowAnyHeader()  // Permite qualquer cabeçalho na requisição (ex: Content-Type).
+                                    .AllowAnyMethod(); // Permite qualquer método HTTP (GET, POST, PUT, DELETE).
+                          }
                       });
-});
+}); 
 
 // --- FIM DA SOLUÇÃO ---
 
@@ -45,7 +50,7 @@ builder.Services.AddControllers();
 // Configura o Entity Framework Core para usar o SQL Server.
 // A string de conexão é lida do arquivo appsettings.json.
 builder.Services.AddDbContext<WebClinicDbContext>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("WebClinicSystemCs"))
+    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
 
 // Adiciona os serviços do MediatR para implementar o padrão CQRS.

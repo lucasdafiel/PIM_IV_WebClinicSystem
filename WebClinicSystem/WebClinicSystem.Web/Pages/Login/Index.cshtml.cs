@@ -58,17 +58,16 @@ namespace WebClinicSystem.Web.Pages.Login
                 return Page(); // Se inválido, recarrega a página para exibir os erros de validação.
             }
 
-            // Cria um cliente HTTP para se comunicar com a API.
-            var httpClient = _httpClientFactory.CreateClient();
+            // Cria um cliente HTTP nomeado para se comunicar com a API (usa base address de appsettings.json).
+            var httpClient = _httpClientFactory.CreateClient("WebClinicSystemApi");
 
             // Cria um objeto anônimo com os dados de login no formato que a API espera.
             var loginData = new { email = Input.Email, password = Input.Senha };
 
             try
             {
-                // Envia a requisição POST para o endpoint de login da API.
-                // A URL da API deve ser a mesma configurada no launchSettings.json do projeto da API.
-                var response = await httpClient.PostAsJsonAsync("https://localhost:7013/api/auth/login", loginData);
+                // Usa rota relativa — o HttpClient nomeado já tem BaseAddress configurada.
+                var response = await httpClient.PostAsJsonAsync("api/auth/login", loginData);
 
                 // Verifica se a API retornou um código de sucesso (2xx).
                 if (response.IsSuccessStatusCode)
