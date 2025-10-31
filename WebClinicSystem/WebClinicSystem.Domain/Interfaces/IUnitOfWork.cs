@@ -14,6 +14,10 @@ namespace WebClinicSystem.Domain.Interfaces
         IProfissionalRepository Profissionais { get; }
         // Expõe o repositório de usuários.
         IUsuarioRepository Usuarios { get; }
+        // Expõe o repositório de consultas.
+        IConsultaRepository Consultas { get; }
+        // Expõe o repositório de prontuários.
+        IProntuarioRepository Prontuarios { get; }
 
         // O método que de fato salvará todas as alterações no banco de dados.
         Task<int> CompleteAsync();

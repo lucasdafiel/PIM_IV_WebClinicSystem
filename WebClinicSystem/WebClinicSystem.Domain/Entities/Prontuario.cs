@@ -12,5 +12,8 @@ namespace WebClinicSystem.Domain.Entities
         public string Descricao { get; set; }
         public DateTime DataRegistro { get; set; }
         public int ConsultaId { get; set; } // Chave estrangeira para Consulta
+
+        // Propriedade de navegação
+        public Consulta Consulta { get; set; }
     }
 }

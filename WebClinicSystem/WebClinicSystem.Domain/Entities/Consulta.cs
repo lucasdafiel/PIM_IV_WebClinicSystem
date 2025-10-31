@@ -8,10 +8,22 @@ namespace WebClinicSystem.Domain.Entities
 {
     public class Consulta
     {
+        // Chave primária
         public int ConsultaId { get; set; }
-        public DateTime DataHora { get; set; }
-        public string Status { get; set; }
-        public int PacienteId { get; set; } // Chave estrangeira para Paciente
-        public int ProfissionalId { get; set; } // Chave estrangeira para Profissional
+
+        // Data/hora de início e fim da consulta
+        public DateTime DataHoraInicio { get; set; }
+        public DateTime DataHoraFim { get; set; }
+
+        // Status da consulta (Ex: Agendada, Cancelada, Concluída)
+        public string Status { get; set; } = string.Empty;
+
+        // Chaves estrangeiras
+        public int PacienteId { get; set; }
+        public int ProfissionalId { get; set; }
+
+        // Propriedades de navegação para facilitar consultas com Include
+        public Paciente? Paciente { get; set; }
+        public Profissional? Profissional { get; set; }
     }
 }
