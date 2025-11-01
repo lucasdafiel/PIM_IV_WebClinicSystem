@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 using WebClinicSystem.Application.Features.Consultas.Commands;
 using WebClinicSystem.Application.Features.Consultas.DTOs;
@@ -42,11 +43,19 @@ namespace WebClinicSystem.Api.Controllers
             return NoContent();
         }
 
-        // Endpoint para listar todas as consultas (qualquer perfil autenticado)
+        // Endpoint para listar consultas com filtros opcionais (qualquer perfil autenticado)
+        // RF-05: Suporta filtragem por profissional e por período via query string
         [HttpGet]
-        public async Task<IActionResult> GetAllConsultas()
+        public async Task<IActionResult> GetAllConsultas([FromQuery] int? idProfissional, [FromQuery] DateTime? dataInicio, [FromQuery] DateTime? dataFim)
         {
-            var query = new GetAllConsultasQuery();
+            // Cria e envia a nova query que contém os filtros opcionais
+            var query = new GetConsultasFiltradasQuery
+            {
+                IdProfissional = idProfissional,
+                DataInicio = dataInicio,
+                DataFim = dataFim
+            };
+
             var consultas = await _mediator.Send(query);
             return Ok(consultas);
         }
