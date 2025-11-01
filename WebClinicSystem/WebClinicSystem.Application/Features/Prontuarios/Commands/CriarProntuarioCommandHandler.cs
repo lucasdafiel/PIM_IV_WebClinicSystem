@@ -19,6 +19,21 @@ namespace WebClinicSystem.Application.Features.Prontuarios.Commands
 
         public async Task<int> Handle(CriarProntuarioCommand request, CancellationToken cancellationToken)
         {
+            // RN-12: Um prontuário só pode ser criado para uma consulta com status 'Concluída'.
+            // Busca a consulta relacionada usando o repositório
+            var consulta = await _unitOfWork.Consultas.GetByIdAsync(request.Prontuario.IdConsulta);
+
+            // Se a consulta não for encontrada, lança exceção de chave não encontrada
+            if (consulta == null)
+                throw new KeyNotFoundException("Consulta não encontrada.");
+
+            // Verifica o status da consulta
+            if (!string.Equals(consulta.Status, "Concluída", StringComparison.OrdinalIgnoreCase))
+            {
+                // Se não estiver concluída, bloqueia a operação conforme regra de negócio
+                throw new InvalidOperationException("Prontuários só podem ser criados para consultas já concluídas.");
+            }
+
             // Cria a entidade Prontuario a partir do DTO
             var prontuario = new Prontuario
             {

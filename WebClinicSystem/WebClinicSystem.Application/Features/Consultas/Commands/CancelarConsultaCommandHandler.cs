@@ -1,4 +1,5 @@
 using MediatR;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using WebClinicSystem.Domain.Interfaces;
@@ -17,16 +18,24 @@ namespace WebClinicSystem.Application.Features.Consultas.Commands
 
         public async Task<bool> Handle(CancelarConsultaCommand request, CancellationToken cancellationToken)
         {
-            // Busca a consulta pelo Id
-            var consulta = await _unitOfWork.Consultas.GetByIdAsync(request.Id);
+            // Carrega a consulta usando o repositório (por IdConsulta)
+            var consulta = await _unitOfWork.Consultas.GetByIdAsync(request.IdConsulta);
 
+            // Se não encontrada, retorna false conforme contrato
             if (consulta == null)
-                return false; // Consulta não encontrada
+                return false;
 
-            // Altera o status para "Cancelada"
+            // RN-11: Apenas consultas com status 'Agendada' podem ser canceladas
+            if (!string.Equals(consulta.Status, "Agendada", StringComparison.OrdinalIgnoreCase))
+            {
+                // Lança exceção de negócio informando que não é possível cancelar
+                throw new InvalidOperationException("A consulta não pode ser cancelada.");
+            }
+
+            // Atualiza o status para 'Cancelada'
             consulta.Status = "Cancelada";
 
-            // Salva as alterações
+            // Salva as alterações no banco via UnitOfWork
             await _unitOfWork.CompleteAsync();
 
             return true;
