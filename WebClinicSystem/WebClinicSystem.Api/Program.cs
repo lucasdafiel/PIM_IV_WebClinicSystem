@@ -59,10 +59,15 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<Re
 
 // Injeção de Dependência: Registra as interfaces e suas implementações concretas.
 // Isso permite que a aplicação seja mais desacoplada e testável.
-builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
+// Injeção dos Repositórios (Infrastructure)
 builder.Services.AddScoped<IProfissionalRepository, ProfissionalRepository>();
+builder.Services.AddScoped<IPacienteRepository, PacienteRepository>();
+builder.Services.AddScoped<IProntuarioRepository, ProntuarioRepository>();
+builder.Services.AddScoped<IConsultaRepository, ConsultaRepository>();
+builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
+// Injeção do Serviço de Autenticação
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Configura o Swagger/OpenAPI para documentação da API.

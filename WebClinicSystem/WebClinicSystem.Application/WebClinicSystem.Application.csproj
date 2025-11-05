@@ -16,8 +16,4 @@
     <ProjectReference Include="..\WebClinicSystem.Domain\WebClinicSystem.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\Consultas\Commands\" />
-  </ItemGroup>
-
 </Project>

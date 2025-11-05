@@ -1,18 +1,40 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.Collections.Generic;
-
-// Criamos um "apelido" para a classe Usuario
-using UsuarioEntity = WebClinicSystem.Domain.Entities.Usuario;
+using System.Linq;
+using System.Threading.Tasks;
+using WebClinicSystem.Application.Features.Usuarios.DTOs;
+using WebClinicSystem.Web.Services;
 
 namespace WebClinicSystem.Web.Pages.Usuarios
 {
+    // 1. Adiciona a diretiva [Authorize(Roles = "Administrador")]
+    [Authorize(Roles = "Administrador")]
     public class IndexModel : PageModel
     {
-        public List<UsuarioEntity> ListaDeUsuarios { get; set; }
+        // 2. Injeta o novo serviço 'IUsuarioApiService'
+        private readonly IUsuarioApiService _usuarioApiService;
 
-        public void OnGet()
+        public IndexModel(IUsuarioApiService usuarioApiService)
         {
-            ListaDeUsuarios = new List<UsuarioEntity>();
+            _usuarioApiService = usuarioApiService;
+        }
+
+        // 3. Propriedade 'public IList<UsuarioDto> Usuarios { get; set; }'
+        // (Usando UsuarioDto, conforme DTOs que criamos)
+        public IList<UsuarioDto> Usuarios { get; set; } = new List<UsuarioDto>();
+
+        // 4. No método OnGetAsync(), chama '_usuarioApiService.GetAllAsync()'
+        public async Task OnGetAsync()
+        {
+            // Busca os dados da API
+            var usuariosEnumerable = await _usuarioApiService.GetAllAsync();
+
+            // Popula a lista (seguindo o exemplo de Profissionais/Index.cshtml.cs)
+            if (usuariosEnumerable != null)
+            {
+                Usuarios = usuariosEnumerable.ToList();
+            }
         }
     }
 }

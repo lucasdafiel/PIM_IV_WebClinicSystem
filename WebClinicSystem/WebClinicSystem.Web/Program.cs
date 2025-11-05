@@ -16,6 +16,8 @@ builder.Services.AddScoped<IAuthApiService, AuthApiService>();
 builder.Services.AddScoped<IPacienteApiService, PacienteApiService>();
 builder.Services.AddScoped<IProfissionalApiService, ProfissionalApiService>();
 builder.Services.AddScoped<IConsultaApiService, ConsultaApiService>();
+builder.Services.AddScoped<IUsuarioApiService, UsuarioApiService>();
+builder.Services.AddScoped<IProntuarioApiService, ProntuarioApiService>();
 
 builder.Services.AddHttpClient("WebClinicSystemApi", client =>
 {
