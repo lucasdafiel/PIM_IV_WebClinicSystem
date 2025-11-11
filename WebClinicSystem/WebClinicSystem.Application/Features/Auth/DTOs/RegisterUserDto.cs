@@ -1,13 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace WebClinicSystem.Application.Features.Auth.DTOs
 {
-    public record RegisterUserDto(
-        string Email,
-        string Password,
-        int PerfilId);
+    public class RegisterUserDto
+    {
+        [Required]
+        [StringLength(100)]
+        public string Email { get; set; }
+
+        [Required]
+        [StringLength(100)]
+        public string Password { get; set; }
+
+        [Required]
+        public int PerfilId { get; set; }
+    }
 }

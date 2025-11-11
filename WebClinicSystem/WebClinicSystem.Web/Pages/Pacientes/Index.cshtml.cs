@@ -2,17 +2,17 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using WebClinicSystem.Application.Features.Pacientes.DTOs; // Use o DTO
 using WebClinicSystem.Web.Services; // Importe o serviço
+using System; // Adicionado para Exception
+using System.Linq; // Adicionado para .ToList()
+using System.Collections.Generic; // Adicionado para List<T>
+using System.Threading.Tasks; // Adicionado para Task
+using Microsoft.AspNetCore.Authorization; // Adicionado para [Authorize]
 
 namespace WebClinicSystem.Web.Pages.Pacientes
 {
-    // Adicione a diretiva [Authorize] para proteger a página.
-    // O sistema de Cookies que configuramos vai cuidar disso.
-    [Microsoft.AspNetCore.Authorization.Authorize]
+    [Authorize(Roles = "Administrador,Recepcionista")]
     public class IndexModel : PageModel
     {
-        // 1. Remova qualquer DbContext ou IUnitOfWork que estava aqui
-
-        // 2. Injete o novo serviço da API
         private readonly IPacienteApiService _pacienteApiService;
 
         public IndexModel(IPacienteApiService pacienteApiService)
@@ -20,30 +20,49 @@ namespace WebClinicSystem.Web.Pages.Pacientes
             _pacienteApiService = pacienteApiService;
         }
 
-        // 3. A lista agora é de PacienteDto, não da entidade Paciente
         public IList<PacienteDto> Pacientes { get; set; } = new List<PacienteDto>();
 
-        // 4. O OnGetAsync agora chama a API
+        // O OnGetAsync está correto
         public async Task OnGetAsync()
         {
             try
             {
-                // Chama o serviço, que chama a API, que chama o Handler...
                 var pacientesResult = await _pacienteApiService.GetAllAsync();
                 if (pacientesResult != null)
                 {
                     Pacientes = pacientesResult.ToList();
                 }
             }
-            catch (HttpRequestException ex)
+            catch (Exception ex)
             {
-                // Se a API falhar (ex: token expirado ou API offline),
-                // você pode tratar o erro aqui.
-                // Por enquanto, apenas logamos no console (ideal seria um log real)
-                Console.WriteLine($"Erro ao buscar pacientes: {ex.Message}");
-                // Você pode adicionar uma mensagem de erro para o usuário
-                // TempData["ErrorMessage"] = "Não foi possível carregar os pacientes.";
+                // Adiciona uma mensagem de erro para o usuário via TempData
+                TempData["ErrorMessage"] = $"Não foi possível carregar os pacientes: {ex.Message}";
             }
         }
+
+        // --- INÍCIO DA MODIFICAÇÃO (TAREFA 1) ---
+
+        /// <summary>
+        /// Handler para exclusão de paciente.
+        /// </summary>
+        public async Task<IActionResult> OnPostDeleteAsync(int id)
+        {
+            try
+            {
+                // 1. Chama o serviço da API para deletar
+                await _pacienteApiService.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Paciente excluído com sucesso!";
+            }
+            catch (Exception ex)
+            {
+                // Se a API falhar (ex: paciente não encontrado ou erro interno)
+                TempData["ErrorMessage"] = $"Erro ao excluir o paciente: {ex.Message}";
+            }
+
+            // 2. Recarrega a página (o que vai disparar o OnGetAsync novamente)
+            return RedirectToPage();
+        }
+
+        // --- FIM DA MODIFICAÇÃO ---
     }
 }

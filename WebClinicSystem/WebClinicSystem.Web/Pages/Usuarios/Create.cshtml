@@ -1,0 +1,30 @@
+@page
+@model WebClinicSystem.Web.Pages.Usuarios.CreateModel
+@{
+    ViewData["Title"] = "Criar Usuário";
+}
+
+<h2>Criar Usuário</h2>
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="RegisterUserDto.Email"></label>
+        <input asp-for="RegisterUserDto.Email" class="form-control" />
+        <span asp-validation-for="RegisterUserDto.Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="RegisterUserDto.Password"></label>
+        <input asp-for="RegisterUserDto.Password" class="form-control" type="password" />
+        <span asp-validation-for="RegisterUserDto.Password" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="RegisterUserDto.PerfilId">Perfil</label>
+        <select asp-for="RegisterUserDto.PerfilId" asp-items="Model.PerfisSelectList" class="form-control"></select>
+        <span asp-validation-for="RegisterUserDto.PerfilId" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Criar</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

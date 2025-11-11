@@ -19,5 +19,12 @@ namespace WebClinicSystem.Web.Services
 
         // Corrigido para Guid
         Task DeleteAsync(Guid id);
+
+        // Adicionado para dropdown de perfis
+        Task<IEnumerable<PerfilDto>> GetPerfis();
+
+        // Wrappers com nomes em pt-br solicitados pela UI
+        Task<UsuarioDto> GetUsuarioById(Guid id);
+        Task UpdateUsuario(Guid id, UpdateUsuarioDto dto);
     }
 }

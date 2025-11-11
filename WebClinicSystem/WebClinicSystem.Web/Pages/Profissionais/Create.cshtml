@@ -1,0 +1,36 @@
+@page
+@model WebClinicSystem.Web.Pages.Profissionais.CreateModel
+@{
+    ViewData["Title"] = "Cadastrar Profissional";
+}
+
+<h2>Cadastrar Profissional</h2>
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="Profissional.Nome"></label>
+        <input asp-for="Profissional.Nome" class="form-control" />
+        <span asp-validation-for="Profissional.Nome" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Profissional.Telefone"></label>
+        <input asp-for="Profissional.Telefone" class="form-control" />
+        <span asp-validation-for="Profissional.Telefone" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Profissional.CRM">CRM</label>
+        <input asp-for="Profissional.CRM" class="form-control" />
+        <span asp-validation-for="Profissional.CRM" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Profissional.Especialidade"></label>
+        <input asp-for="Profissional.Especialidade" class="form-control" />
+        <span asp-validation-for="Profissional.Especialidade" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Cadastrar</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,36 @@
+@page "{id:guid}"
+@model WebClinicSystem.Web.Pages.Usuarios.EditModel
+@{
+    ViewData["Title"] = "Editar Usuário";
+}
+
+<h2>Editar Usuário</h2>
+
+<form method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group">
+        <label asp-for="Usuario.Nome"></label>
+        <input asp-for="Usuario.Nome" class="form-control" />
+        <span asp-validation-for="Usuario.Nome" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Usuario.Email"></label>
+        <input asp-for="Usuario.Email" class="form-control" />
+        <span asp-validation-for="Usuario.Email" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Usuario.PerfilId">Perfil</label>
+        <select asp-for="Usuario.PerfilId" asp-items="Model.PerfisSelectList" class="form-control"></select>
+        <span asp-validation-for="Usuario.PerfilId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Salvar</button>
+    <a asp-page="/Usuarios/Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

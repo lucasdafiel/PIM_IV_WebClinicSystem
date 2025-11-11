@@ -26,7 +26,7 @@ namespace WebClinicSystem.Infrastructure.Persistence.Repositories
             await _context.Pacientes.AddAsync(paciente);
         }
 
-        public async Task<IEnumerable<Paciente>> GetAllAsync()
+        public async Task<List<Paciente>> GetAllAsync()
         {
             // ToListAsync() executa a consulta no banco e retorna todos os registros da tabela Pacientes.
             return await _context.Pacientes.ToListAsync();
@@ -51,6 +51,11 @@ namespace WebClinicSystem.Infrastructure.Persistence.Repositories
             // FirstOrDefaultAsync retorna o primeiro paciente que encontrar com o CPF
             // ou null se não encontrar nenhum.
             return await _context.Pacientes.FirstOrDefaultAsync(p => p.Cpf == cpf);
+        }
+
+        public void Update(Paciente paciente)
+        {
+            _context.Pacientes.Update(paciente);
         }
     }
 }

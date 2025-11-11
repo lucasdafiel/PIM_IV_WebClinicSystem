@@ -1,0 +1,55 @@
+﻿@page
+@model WebClinicSystem.Web.Pages.Pacientes.EditModel
+@{
+    ViewData["Title"] = "Editar Paciente";
+}
+
+<header class="pb-3 mb-4 border-bottom">
+    <h1>@ViewData["Title"]</h1>
+</header>
+
+<div class="row">
+    <div class="col-md-8 col-lg-6">
+        <form method="post">
+
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+
+                    <div class="mb-3">
+                        <label class="form-label">CPF</label>
+                        <input class="form-control" value="@Model.CpfDisplay" readonly disabled />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Data de Nascimento</label>
+                        <input class="form-control" value="@Model.DataNascimentoDisplay.ToString("yyyy-MM-dd")" readonly disabled />
+                    </div>
+
+                    <hr />
+
+                    <div class="mb-3">
+                        <label asp-for="Paciente.NomeCompleto" class="form-label">Nome Completo</label>
+                        <input asp-for="Paciente.NomeCompleto" class="form-control" />
+                        <span asp-validation-for="Paciente.NomeCompleto" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Paciente.TelefoneContato" class="form-label">Telefone</label>
+                        <input asp-for="Paciente.TelefoneContato" class="form-control" />
+                        <span asp-validation-for="Paciente.TelefoneContato" class.text-danger"></span>
+                    </div>
+                </div>
+                <div class="card-footer text-end">
+                    <a asp-page="/Pacientes/Index" class="btn btn-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

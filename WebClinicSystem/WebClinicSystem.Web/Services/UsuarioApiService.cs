@@ -75,6 +75,24 @@ namespace WebClinicSystem.Web.Services
             response.EnsureSuccessStatusCode();
         }
 
+        public async Task<IEnumerable<PerfilDto>> GetPerfis()
+        {
+            var client = CreateClient();
+            // Supondo endpoint: api/usuarios/perfis
+            return await client.GetFromJsonAsync<IEnumerable<PerfilDto>>(ApiBasePath + "/perfis");
+        }
+
+        public async Task<UsuarioDto> GetUsuarioById(Guid id)
+        {
+            // Reaproveita GetByIdAsync
+            return await GetByIdAsync(id);
+        }
+
+        public async Task UpdateUsuario(Guid id, UpdateUsuarioDto dto)
+        {
+            await UpdateAsync(id, dto);
+        }
+
         #endregion
     }
 }

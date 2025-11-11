@@ -21,5 +21,6 @@ namespace WebClinicSystem.Domain.Interfaces
 
         // O método que de fato salvará todas as alterações no banco de dados.
         Task<int> CompleteAsync();
+        Task<int> CommitAsync(); // Adicionado para compatibilidade
     }
 }

@@ -1,0 +1,76 @@
+﻿@page "/Profissionais/Edit/{id:int}"
+@model WebClinicSystem.Web.Pages.Profissionais.EditModel
+@{
+    ViewData["Title"] = "Editar Profissional";
+}
+
+@* Adiciona os helpers de tags do ASP.NET Core (para asp-for, asp-validation-for) *@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<h1>Editar Profissional</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-6">
+
+        @* 1. Formulário (method="post")
+            Quando submetido, chama o método OnPostAsync no PageModel. *@
+        <form method="post">
+
+            @* 2. Validação
+                Exibe um sumário de erros de validação (se houver). *@
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @* 3. ID Oculto
+                Armazena o ID do profissional. O 'asp-for="Id"' amarra este
+                input à propriedade 'public int Id { get; set; }' no PageModel. *@
+            <input type="hidden" asp-for="Id" />
+
+            @* 4. Campos do Formulário
+                Cada 'asp-for' aponta para uma propriedade dentro de 'Profissional'
+                (o nosso [BindProperty] UpdateProfissionalDto).
+            *@
+
+            <div class="form-group mb-3">
+                <label asp-for="Profissional.NomeCompleto" class="form-label">Nome Completo</label>
+                <input asp-for="Profissional.NomeCompleto" class="form-control" />
+                <span asp-validation-for="Profissional.NomeCompleto" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Profissional.Especialidade" class="form-label"></label>
+                <input asp-for="Profissional.Especialidade" class="form-control" />
+                <span asp-validation-for="Profissional.Especialidade" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Profissional.Telefone" class="form-label"></label>
+                <input asp-for="Profissional.Telefone" class="form-control" />
+                <span asp-validation-for="Profissional.Telefone" class="text-danger"></span>
+            </div>
+
+            @* 5. Campo Somente-Leitura (CRM)
+                Este campo está amarrado à propriedade 'RegistroConselho' do Model,
+                e não ao 'UpdateProfissionalDto'. O 'readonly' impede a edição. *@
+            <div class="form-group mb-3">
+                <label asp-for="RegistroConselho" class="form-label">CRM</label>
+                <input asp-for="RegistroConselho" class="form-control" readonly />
+                <span asp-validation-for="RegistroConselho" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                <a asp-page="/Profissionais/Index" class="btn btn-secondary ms-2">Cancelar</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@* 6. Scripts de Validação
+    Seção para habilitar a validação do lado do cliente (client-side). *@
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

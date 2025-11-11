@@ -13,7 +13,7 @@ using WebClinicSystem.Web.Services;
 
 namespace WebClinicSystem.Web.Pages.Prontuario
 {
-    [Authorize(Roles = "Profissional de Saúde, Administrador")]
+    [Authorize(Roles = "Administrador,Profissional de Saúde")]
     public class IndexModel : PageModel
     {
         private readonly IProntuarioApiService _prontuarioApiService;

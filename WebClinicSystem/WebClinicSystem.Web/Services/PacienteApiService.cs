@@ -56,7 +56,7 @@ namespace WebClinicSystem.Web.Services
             return null;
         }
 
-        public async Task CreateAsync(PacienteDto dto)
+        public async Task CreateAsync(CreatePacienteDto dto)
         {
             var client = CreateClient();
 

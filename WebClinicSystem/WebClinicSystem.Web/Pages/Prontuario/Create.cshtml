@@ -1,0 +1,77 @@
+﻿@page "/Prontuario/Create/{consultaId:int}"
+@model WebClinicSystem.Web.Pages.Prontuario.CreateModel
+@{
+    ViewData["Title"] = "Criar Prontuário";
+}
+
+@* Adiciona os helpers de tags do ASP.NET Core (para asp-for, asp-validation-for) *@
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<h1>Novo Prontuário</h1>
+<hr />
+
+<h4>Detalhes da Consulta</h4>
+
+@* 1. Exibição dos Dados da Consulta
+    Exibe os dados carregados no OnGetAsync pela propriedade 'Model.Consulta'.
+*@
+<div class="row mb-4">
+    <div class="col-md-6">
+        <dl class="row">
+            <dt class="col-sm-4">Paciente:</dt>
+            <dd class="col-sm-8">@Model.Consulta.NomePaciente</dd>
+
+            <dt class="col-sm-4">Profissional:</dt>
+            <dd class="col-sm-8">@Model.Consulta.NomeProfissional</dd>
+
+            <dt class="col-sm-4">Início:</dt>
+            <dd class="col-sm-8">@Model.Consulta.DataHoraInicio.ToString("g")</dd>
+
+            <dt class="col-sm-4">Status:</dt>
+            <dd class="col-sm-8">@Model.Consulta.Status</dd>
+        </dl>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+
+        @* 2. Formulário (method="post")
+            Quando submetido, chama o método OnPostAsync no PageModel. *@
+        <form method="post">
+
+            @* Exibe um sumário de erros de validação *@
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            @* 3. ID Oculto
+                Armazena o ID da consulta. O 'asp-for' amarra este
+                input à propriedade 'CreateProntuarioDTO.IdConsulta'.
+                (Usamos 'IdConsulta' conforme o DTO, não 'ConsultaId').
+            *@
+            <input type="hidden" asp-for="CreateProntuarioDTO.IdConsulta" />
+
+            @* 4. Campo de Descrição (Textarea) *@
+            <div class="form-group mb-3">
+                <label asp-for="CreateProntuarioDTO.Descricao" class="form-label">Descrição da Consulta (Prontuário)</label>
+
+                @* Um textarea é mais apropriado para a descrição de um prontuário *@
+                <textarea asp-for="CreateProntuarioDTO.Descricao" class="form-control" rows="10"></textarea>
+
+                <span asp-validation-for="CreateProntuarioDTO.Descricao" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-primary">Salvar Prontuário</button>
+                <a asp-page="/Agenda/Index" class="btn btn-secondary ms-2">Cancelar</a>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+@* 5. Scripts de Validação *@
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

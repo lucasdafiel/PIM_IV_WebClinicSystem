@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Authorization; // Importe o Authorize
 
 namespace WebClinicSystem.Web.Pages.Profissionais
 {
-    [Authorize] // Protege a página
+    [Authorize(Roles = "Administrador")] // Protege a página
     public class IndexModel : PageModel
     {
         // Injete o novo serviço

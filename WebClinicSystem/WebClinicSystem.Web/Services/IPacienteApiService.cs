@@ -11,7 +11,7 @@ namespace WebClinicSystem.Web.Services
         Task<PacienteDto> GetByIdAsync(int id);
 
         // Métodos para criar, atualizar e deletar
-        Task CreateAsync(PacienteDto dto);
+        Task CreateAsync(CreatePacienteDto dto);
         Task UpdateAsync(int id, UpdatePacienteDto dto);
         Task DeleteAsync(int id);
     }

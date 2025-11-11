@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using WebClinicSystem.Domain.Entities;
 
@@ -10,9 +7,10 @@ namespace WebClinicSystem.Domain.Interfaces
     public interface IPacienteRepository
     {
         Task<Paciente> GetByIdAsync(int id);
-        Task<IEnumerable<Paciente>> GetAllAsync();
-        Task AddAsync(Paciente paciente);
-        void Delete(Paciente paciente);
+        Task<List<Paciente>> GetAllAsync();
         Task<Paciente> GetByCpfAsync(string cpf);
+        Task AddAsync(Paciente paciente);
+        void Update(Paciente paciente);
+        void Delete(Paciente paciente);
     }
 }

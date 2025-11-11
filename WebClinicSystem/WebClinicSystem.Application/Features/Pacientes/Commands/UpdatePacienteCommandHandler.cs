@@ -1,53 +1,52 @@
 ﻿using MediatR;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using WebClinicSystem.Application.Features.Pacientes.DTOs;
+using WebClinicSystem.Domain.Entities;
 using WebClinicSystem.Domain.Interfaces;
 
 namespace WebClinicSystem.Application.Features.Pacientes.Commands
 {
-    public class UpdatePacienteCommandHandler : IRequestHandler<UpdatePacienteCommand>
+    public class UpdatePacienteCommandHandler : IRequestHandler<UpdatePacienteCommand, PacienteDto>
     {
+        private readonly IPacienteRepository _pacienteRepository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public UpdatePacienteCommandHandler(IUnitOfWork unitOfWork)
+        public UpdatePacienteCommandHandler(IPacienteRepository pacienteRepository, IUnitOfWork unitOfWork)
         {
+            _pacienteRepository = pacienteRepository;
             _unitOfWork = unitOfWork;
         }
 
-        public async Task Handle(UpdatePacienteCommand request, CancellationToken cancellationToken)
+        public async Task<PacienteDto> Handle(UpdatePacienteCommand request, CancellationToken cancellationToken)
         {
-            // 1. Busca o paciente existente no banco de dados.
-            var paciente = await _unitOfWork.Pacientes.GetByIdAsync(request.PacienteId);
+            var paciente = await _pacienteRepository.GetByIdAsync(request.IdPaciente);
 
-            // 2. Se não encontrar, pode lançar uma exceção (a ser tratada pelo controller).
-            if (paciente is null)
+            if (paciente == null)
             {
-                // No futuro, podemos criar exceções personalizadas.
-                throw new KeyNotFoundException("Paciente não encontrado.");
+                return null;
             }
 
-            // Verifica se o CPF está sendo alterado para um que já existe.
-            if (paciente.Cpf != request.Cpf)
-            {
-                var outroPacienteComCpf = await _unitOfWork.Pacientes.GetByCpfAsync(request.Cpf);
-                if (outroPacienteComCpf is not null)
-                {
-                    throw new InvalidOperationException("O CPF informado já está em uso por outro paciente.");
-                }
-            }
+            // Aplica as mudanças do DTO
+            paciente.NomeCompleto = request.Dto.NomeCompleto;
+            paciente.TelefoneContato = request.Dto.TelefoneContato;
 
-            // 3. Atualiza as propriedades do objeto que veio do banco.
-            paciente.NomeCompleto = request.NomeCompleto;
-            paciente.Cpf = request.Cpf;
-            paciente.DataNascimento = request.DataNascimento;
-            paciente.TelefoneContato = request.TelefoneContato;
-            paciente.Email = request.Email;
+            // Esta linha (CS1061) será corrigida na próxima etapa
+            _pacienteRepository.Update(paciente);
 
-            // 4. Salva as alterações. O EF Core detecta as mudanças e as envia para o banco.
+            // Esta linha (CS1061) será corrigida na próxima etapa
             await _unitOfWork.CompleteAsync();
+
+            // Retorna o DTO atualizado
+            return new PacienteDto(
+                paciente.PacienteId,
+                paciente.NomeCompleto,
+                paciente.Cpf,
+                paciente.DataNascimento,
+                paciente.TelefoneContato,
+                paciente.Email
+            );
         }
     }
 }

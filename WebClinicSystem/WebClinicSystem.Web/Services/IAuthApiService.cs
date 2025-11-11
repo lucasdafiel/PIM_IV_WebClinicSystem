@@ -11,5 +11,8 @@ namespace WebClinicSystem.Web.Services
 
         // Realiza o logout no cliente (pode limpar cookies/sessão)
         Task LogoutAsync();
+
+        // Adicionado para registro de usuário
+        Task<bool> RegisterUser(RegisterUserDto dto);
     }
 }

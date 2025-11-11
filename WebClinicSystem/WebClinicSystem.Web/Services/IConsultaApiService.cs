@@ -16,5 +16,8 @@ namespace WebClinicSystem.Web.Services
 
         // Método para o relatório (RF-08)
         Task<RelatorioConsultasDTO> GetRelatorioAsync(DateTime dataInicio, DateTime dataFim, int? idProfissional);
+
+        // Método para obter uma consulta por ID
+        Task<ConsultaDTO> GetByIdAsync(int id);
     }
 }

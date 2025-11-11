@@ -60,5 +60,19 @@ namespace WebClinicSystem.Web.Services
             _httpContextAccessor.HttpContext.Session.Remove("JWToken");
             return Task.CompletedTask;
         }
+
+        public async Task<bool> RegisterUser(RegisterUserDto dto)
+        {
+            var client = _httpClientFactory.CreateClient("WebClinicSystemApi");
+            try
+            {
+                var response = await client.PostAsJsonAsync("api/auth/register", dto);
+                return response.IsSuccessStatusCode;
+            }
+            catch (HttpRequestException)
+            {
+                return false;
+            }
+        }
     }
 }

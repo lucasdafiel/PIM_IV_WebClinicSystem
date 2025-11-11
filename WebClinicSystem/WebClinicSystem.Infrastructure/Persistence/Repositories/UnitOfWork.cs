@@ -35,6 +35,11 @@ namespace WebClinicSystem.Infrastructure.Persistence.Repositories
             return await _context.SaveChangesAsync();
         }
 
+        public async Task<int> CommitAsync()
+        {
+            return await _context.SaveChangesAsync();
+        }
+
         // Método para liberar a conexão com o banco de dados.
         public void Dispose()
         {

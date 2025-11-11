@@ -1,0 +1,38 @@
+@page
+@model WebClinicSystem.Web.Pages.Agenda.CreateModel
+@{
+    ViewData["Title"] = "Agendar Consulta";
+}
+
+<h2>Agendar Consulta</h2>
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="NovaConsulta.IdPaciente">Paciente</label>
+        <select asp-for="NovaConsulta.IdPaciente" class="form-control" asp-items="Model.PacientesOptions">
+            <option value="">-- Selecione --</option>
+        </select>
+        <span asp-validation-for="NovaConsulta.IdPaciente" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="NovaConsulta.IdProfissional">Profissional</label>
+        <select asp-for="NovaConsulta.IdProfissional" class="form-control" asp-items="Model.ProfissionaisOptions">
+            <option value="">-- Selecione --</option>
+        </select>
+        <span asp-validation-for="NovaConsulta.IdProfissional" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="NovaConsulta.DataHoraInicio">Data e Hora</label>
+        <input asp-for="NovaConsulta.DataHoraInicio" type="datetime-local" class="form-control" />
+        <span asp-validation-for="NovaConsulta.DataHoraInicio" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Agendar</button>
+    <a asp-page="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

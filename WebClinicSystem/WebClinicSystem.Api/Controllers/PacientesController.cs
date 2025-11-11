@@ -68,24 +68,24 @@ namespace WebClinicSystem.Api.Controllers
 
         // --- Endpoint para Atualizar um Paciente Existente (PUT) ---
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> UpdatePaciente(int id, [FromBody] UpdatePacienteDto updatePacienteDto)
+        public async Task<IActionResult> UpdatePaciente(int id, [FromBody] UpdatePacienteDto dto)
         {
             // Mapeia os dados da rota (id) e do corpo (DTO) para o comando.
-            var command = new UpdatePacienteCommand(
-                id,
-                updatePacienteDto.NomeCompleto,
-                updatePacienteDto.Cpf,
-                updatePacienteDto.DataNascimento,
-                updatePacienteDto.TelefoneContato,
-                updatePacienteDto.Email
-            );
+            var command = new UpdatePacienteCommand
+    {
+        IdPaciente = id, // O Id vem da rota
+        Dto = dto        // O Dto (só com Nome e Telefone) vem do corpo
+    };
+    
+    // --- FIM DA CORREÇÃO ---
 
-            // Envia o comando para o MediatR.
-            await _mediator.Send(command);
+    var pacienteAtualizado = await _mediator.Send(command);
+    
+    if (pacienteAtualizado == null)
+        return NotFound();
 
-            // Retorna 204 No Content, que é a resposta padrão para uma atualização bem-sucedida.
-            return NoContent();
-        }
+    return Ok(pacienteAtualizado);
+}
 
         // --- Endpoint para Excluir um Paciente (DELETE) ---
         [HttpDelete("{id:int}")]

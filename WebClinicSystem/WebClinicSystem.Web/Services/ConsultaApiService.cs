@@ -88,5 +88,25 @@ namespace WebClinicSystem.Web.Services
 
             return null; // Ou um DTO de relatório vazio
         }
+
+        public async Task<ConsultaDTO> GetByIdAsync(int id)
+        {
+            var client = CreateClient();
+
+            // Define o endpoint da API para buscar uma consulta específica
+            var url = $"api/consultas/{id}";
+
+            var response = await client.GetAsync(url);
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Se a API retornar 200 OK, desserializa a consulta
+                var consulta = await response.Content.ReadFromJsonAsync<ConsultaDTO>();
+                return consulta;
+            }
+
+            // Se a API retornar 404 (Não Encontrado) ou outro erro, retorna nulo
+            return null;
+        }
     }
 }

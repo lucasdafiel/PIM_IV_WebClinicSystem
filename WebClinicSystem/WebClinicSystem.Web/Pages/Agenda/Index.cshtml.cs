@@ -8,7 +8,7 @@ using WebClinicSystem.Web.Services; // Importe o serviço
 
 namespace WebClinicSystem.Web.Pages.Agenda
 {
-    [Authorize] // Protege a página
+    [Authorize(Roles = "Administrador,Recepcionista")] // Protege a página
     public class IndexModel : PageModel
     {
         private readonly IConsultaApiService _consultaApiService;
